@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div class="nav" id="nav">
+    <a href="classes">Классы</a>
+    <a href="races">Расы</a>
+    <a href="feats">Черты</a>
+    <a href="news">Новости</a>
+    <div class="profile">
+        <a href="profile">Войти</a>
+    </div>
+</div>
+<p th:text="|Привет, ${title}!|" />
+</body>
+</html>
