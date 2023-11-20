@@ -1,5 +1,8 @@
 package com.example.spring2023.controllers;
 
+import com.example.spring2023.models.Items;
+import com.example.spring2023.repo.ItemsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,5 +29,15 @@ public class MainController {
     public String feats(Model model) {
         model.addAttribute("title", "Черты");
         return "feats";
+    }
+
+    @Autowired
+    private ItemsRepository itemsRepository;
+
+    @GetMapping("/items")
+    public String items(Model model) {
+        Iterable<Items> items = itemsRepository.findAll();
+        model.addAttribute("items", items);
+        return "items";
     }
 }
