@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class MainController {
@@ -39,5 +41,16 @@ public class MainController {
         Iterable<Items> items = itemsRepository.findAll();
         model.addAttribute("items", items);
         return "items";
+    }
+
+    @GetMapping("/items/add")
+    public String itemsAdd(Model model) {
+        return "items-add";
+    }
+    @PostMapping("/items/add")
+    public String itemsPostAdd(@RequestParam String name, @RequestParam String rarity, @RequestParam String description, @RequestParam String type, @RequestParam String source, Model model) {
+        Items items = new Items(name, rarity, description, type, source);
+        itemsRepository.save(items);
+        return "redirect:/items";
     }
 }

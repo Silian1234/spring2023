@@ -73,4 +73,15 @@ public class Items {
     public void setViews(int views) {
         this.views = views;
     }
+
+    public Items() {
+    }
+
+    public Items(String name, String rarity, String description, String type, String source) {
+        this.name = name;
+        this.rarity = rarity;
+        this.description = description;
+        this.type = type;
+        this.source = source;
+    }
 }
