@@ -8,10 +8,15 @@
 <body>
 <header th:insert="blocks/header :: header"></header>
 <div class="container mt-5">
-<div th:each="el : ${items}" class="alert alert-info mt-2">
+<div th:each="el : ${item}" class="alert alert-info mt-2">
   <h3 th:text="${el.name}"/>
+  <p th:text="${el.type}"/>
   <p th:text="${el.rarity}"/>
-  <a th:href="'/items/' + ${el.id}">Подробнее</a>
+  <p th:text="${el.description}"/>
+  <p><b>Источник:</b> <span th:text="${el.source}"/></p>
+  <br>
+  <a th:href="'/items/' + ${el.id} + '/edit'">Редактировать</a>
+  <a th:href="'/items/' + ${el.id} + '/remove'">Удалить</a>
 </div>
 </div>
 <br>

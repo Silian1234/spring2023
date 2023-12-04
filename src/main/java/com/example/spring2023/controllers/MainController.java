@@ -6,8 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.ArrayList;
+import java.util.Optional;
 
 @Controller
 public class MainController {
@@ -47,6 +51,16 @@ public class MainController {
     public String itemsAdd(Model model) {
         return "items-add";
     }
+
+    @GetMapping("/items/{id}")
+    public String itemsInfo(@PathVariable(value = "id") long id, Model model) {
+        Optional<Items> item = itemsRepository.findById(id);
+        ArrayList<Items> result = new ArrayList<>();
+        item.ifPresent(result::add);
+        model.addAttribute("item", result);
+        return "items-info";
+    }
+
     @PostMapping("/items/add")
     public String itemsPostAdd(@RequestParam String name, @RequestParam String rarity, @RequestParam String description, @RequestParam String type, @RequestParam String source, Model model) {
         Items items = new Items(name, rarity, description, type, source);
