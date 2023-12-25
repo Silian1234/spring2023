@@ -33,4 +33,10 @@ public class ProfileController {
         usersRepository.save(user);
         return "redirect:";
     }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login"; // Имя вашего шаблона страницы входа
+    }
+
 }
