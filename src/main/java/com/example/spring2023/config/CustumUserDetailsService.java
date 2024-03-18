@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-class CustomUserDetailsService implements UserDetailsService {
+class CustumUserDetailsService implements UserDetailsService {
 
     // Внедрите ваш репозиторий для доступа к данным пользователя
 
