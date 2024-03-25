@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.Console;
+
 @Controller
 public class ProfileController {
     @GetMapping("/profile")
@@ -39,7 +41,6 @@ public class ProfileController {
         usersRepository.save(user);
         return "redirect:/login"; // Перенаправление на страницу входа после успешной регистрации
     }
-
 
     @GetMapping("/login")
     public String login() {

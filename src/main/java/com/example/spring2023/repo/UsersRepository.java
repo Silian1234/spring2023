@@ -1,7 +1,10 @@
 package com.example.spring2023.repo;
 
 import com.example.spring2023.models.Users;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UsersRepository extends CrudRepository<Users, Long>{
+import java.util.Optional;
+
+public interface UsersRepository extends JpaRepository<Users, Long> {
+    Optional<Users> findByEmail(String email);
 }

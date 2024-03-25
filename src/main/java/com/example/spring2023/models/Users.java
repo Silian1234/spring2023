@@ -60,7 +60,7 @@ public class Users {
 
     }
 
-    public Users(String name, String password, String email, String userType) {
+    public Users(String name, String email, String password, String userType) {
         this.id = id;
         this.name = name;
         this.password = password;
