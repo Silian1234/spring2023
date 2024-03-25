@@ -4,6 +4,7 @@ import com.example.spring2023.models.Items;
 import com.example.spring2023.models.Users;
 import com.example.spring2023.repo.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,17 +23,23 @@ public class ProfileController {
     private UsersRepository usersRepository;
 
     @GetMapping("/registration")
-    public String itemsAdd(Model model) {
+    public String usersAdd(Model model) {
         return "profileDir/profileReg";
     }
 
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping("/registration")
     public String usersPostAdd(@RequestParam String name, @RequestParam String email, @RequestParam String password, @RequestParam(required = false) String type, Model model) {
-        Users user = new Users(name, email, password, type);
+        String encodedPassword = passwordEncoder.encode(password);
+        Users user = new Users(name, email, encodedPassword, type);
         user.setUserType("user");
         usersRepository.save(user);
-        return "redirect:";
+        return "redirect:/login"; // Перенаправление на страницу входа после успешной регистрации
     }
+
 
     @GetMapping("/login")
     public String login() {
