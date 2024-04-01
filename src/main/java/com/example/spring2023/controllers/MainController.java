@@ -1,6 +1,8 @@
 package com.example.spring2023.controllers;
 
+import com.example.spring2023.models.Feats;
 import com.example.spring2023.models.Items;
+import com.example.spring2023.repo.FeatsRepository;
 import com.example.spring2023.repo.ItemsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,11 +32,6 @@ public class MainController {
     public String races(Model model) {
         model.addAttribute("title", "Расы");
         return "races";
-    }
-    @GetMapping("/feats")
-    public String feats(Model model) {
-        model.addAttribute("title", "Черты");
-        return "feats";
     }
 
     @Autowired

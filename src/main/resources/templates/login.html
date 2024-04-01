@@ -10,7 +10,8 @@
 <div class="container mt-5">
   <h1>Авторизация пользователя</h1>
   <form action="/login" method="post">
-    <input  type="text" name="name" placeholder="Введите имя" class="form-control"><br>
+    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+    <input  type="text" name="username" placeholder="Введите имя" class="form-control"><br>
     <input  type="text" name="password" placeholder="Введите пароль" class="form-control"><br>
     <button type="submit" class="btn btn-success">Авторизоваться</button>
     <a href="/registration" class="btn btn-primary">К Регистрации</a>

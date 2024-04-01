@@ -10,6 +10,7 @@
 <div class="container mt-5">
   <h1>Предметы днд</h1>
   <form action="/items/add" method="post">
+    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
     <input  type="text" name="name" placeholder="Введите название" class="form-control"><br>
     <input  type="text" name="rarity" placeholder="Введите редкость" class="form-control"><br>
     <textarea name="description" placeholder="Введите текст предмета" class="form-control"></textarea><br>

@@ -34,9 +34,9 @@ public class ProfileController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/registration")
-    public String usersPostAdd(@RequestParam String name, @RequestParam String email, @RequestParam String password, @RequestParam(required = false) String type, Model model) {
+    public String usersPostAdd(@RequestParam String username, @RequestParam String email, @RequestParam String password, @RequestParam(required = false) String type, Model model) {
         String encodedPassword = passwordEncoder.encode(password);
-        Users user = new Users(name, email, encodedPassword, type);
+        Users user = new Users(username, email, encodedPassword, type);
         user.setUserType("user");
         usersRepository.save(user);
         return "redirect:/login"; // Перенаправление на страницу входа после успешной регистрации
@@ -47,4 +47,8 @@ public class ProfileController {
         return "login"; // Имя вашего шаблона страницы входа
     }
 
+    @PostMapping("/login")
+    public String doLogin(){
+        return "home";
+    }
 }

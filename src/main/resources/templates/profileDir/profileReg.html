@@ -11,7 +11,7 @@
   <h1>Регистрация пользователя</h1>
   <form action="/registration" method="post">
     <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-    <input  type="text" name="name" placeholder="Введите имя" class="form-control"><br>
+    <input  type="text" name="username" placeholder="Введите имя" class="form-control"><br>
     <input  type="text" name="email" placeholder="Введите почту" class="form-control"><br>
     <input  type="text" name="password" placeholder="Введите пароль" class="form-control"><br>
     <button type="submit" class="btn btn-success">Зарегистрироваться</button>
