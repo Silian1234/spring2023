@@ -20,9 +20,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -33,6 +30,12 @@ public class WebSecurityConfig {
                                 new AntPathRequestMatcher("/registration"),
                                 new AntPathRequestMatcher("/login")
                         ).permitAll()
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/items/add"),
+                                new AntPathRequestMatcher("/items/*/edit"),
+                                new AntPathRequestMatcher("/feats/add"),
+                                new AntPathRequestMatcher("/feats/*/edit")
+                        ).hasAnyRole("admin")
                         .anyRequest().authenticated()
                 )
                 .formLogin((form) -> form

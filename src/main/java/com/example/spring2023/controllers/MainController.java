@@ -1,8 +1,6 @@
 package com.example.spring2023.controllers;
 
-import com.example.spring2023.models.Feats;
 import com.example.spring2023.models.Items;
-import com.example.spring2023.repo.FeatsRepository;
 import com.example.spring2023.repo.ItemsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

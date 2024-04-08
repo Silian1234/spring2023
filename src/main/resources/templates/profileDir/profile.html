@@ -8,7 +8,10 @@
 <body>
 <header th:insert="blocks/header :: header"></header>
 <div class="container mt-5">
-<p th:text="|Привет, ${title}!|" />
+    <div th:each="el : ${items}" class="alert alert-info mt-2">
+        <h3 th:text="${el.name}"/>
+        <p th:text="${el.rarity}"/>
+        <a th:href="'/items/' + ${el.id}">Подробнее</a>
 <footer th:insert="blocks/footer :: footer"></footer>
 </div>
 </body>
