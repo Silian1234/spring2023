@@ -6,42 +6,64 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+// Примечание к маршруту для этого контроллера
 @RequestMapping("/lore")
 @Controller
 public class LoreCategoryController {
+    // Инициализация репозитория
     private final LoreCategoryRepository repository;
 
+    // Конструктор с инъекцией репозитория
     LoreCategoryController(LoreCategoryRepository repository) {
         this.repository = repository;
     }
 
+    // Метод для добавления категории
     @PostMapping("/{category_name}")
     public ResponseEntity<String> addCategory(@PathVariable String category_name, @RequestBody LoreCategory category) {
+        // Установка имени категории
         category.setName(category_name);
+        // Сохранение категории в репозиторий
         repository.save(category);
-        return ResponseEntity.ok("Category added.");
+        // Возвращение ответа
+        return ResponseEntity.ok("Категория добавлена.");
     }
 
+    // Метод для обновления категории
     @PostMapping("/{category_name}/update")
     public ResponseEntity<String> updateCategory(@PathVariable String category_name, @RequestBody LoreCategory updatedCategory) {
+        // Поиск существующей категории
         LoreCategory existingCategory = repository.findByName(category_name);
+
+        // Если категория существует, обновляем ее
         if(existingCategory != null){
+            // Обновление имени категории
             existingCategory.setName(updatedCategory.getName());
+            // Сохранение обновленной категории
             repository.save(existingCategory);
-            return ResponseEntity.ok("Category updated.");
+            // Возвращение ответа
+            return ResponseEntity.ok("Категория обновлена.");
         }else{
-            return ResponseEntity.badRequest().body("Category not found.");
+            // Вернуть ошибку, если категория не найдена
+            return ResponseEntity.badRequest().body("Категория не найдена.");
         }
     }
 
+    // Метод для удаления категории
     @GetMapping("/{category_name}/delete")
     public ResponseEntity<String> deleteCategory(@PathVariable String category_name) {
+        // Поиск существующей категории
         LoreCategory existingCategory = repository.findByName(category_name);
+
+        // Если категория существует, удаляем ее
         if(existingCategory != null){
+            // Удаление категории
             repository.delete(existingCategory);
-            return ResponseEntity.ok("Category deleted.");
+            // Возвращение ответа
+            return ResponseEntity.ok("Категория удалена.");
         }else{
-            return ResponseEntity.badRequest().body("Category not found.");
+            // Вернуть ошибку, если категория не найдена
+            return ResponseEntity.badRequest().body("Категория не найдена.");
         }
     }
 }
