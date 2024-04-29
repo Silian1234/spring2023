@@ -21,33 +21,29 @@ public class LoreCategoryController {
     // Метод для добавления категории
     @PostMapping("/{category_name}")
     public ResponseEntity<String> addCategory(@PathVariable String category_name, @RequestBody LoreCategory category) {
-        // Установка имени категории
-        category.setName(category_name);
-        // Сохранение категории в репозиторий
-        repository.save(category);
-        // Возвращение ответа
+        LoreCategory newCategory = new LoreCategory();
+        newCategory.setName(category_name);
+        newCategory.setDescription(category.getDescription()); // Устанавливаем описание из запроса
+        repository.save(newCategory);
         return ResponseEntity.ok("Категория добавлена.");
     }
+
 
     // Метод для обновления категории
     @PostMapping("/{category_name}/update")
     public ResponseEntity<String> updateCategory(@PathVariable String category_name, @RequestBody LoreCategory updatedCategory) {
-        // Поиск существующей категории
         LoreCategory existingCategory = repository.findByName(category_name);
 
-        // Если категория существует, обновляем ее
-        if(existingCategory != null){
-            // Обновление имени категории
+        if (existingCategory != null) {
             existingCategory.setName(updatedCategory.getName());
-            // Сохранение обновленной категории
+            existingCategory.setDescription(updatedCategory.getDescription());  // Обновляем описание категории
             repository.save(existingCategory);
-            // Возвращение ответа
             return ResponseEntity.ok("Категория обновлена.");
-        }else{
-            // Вернуть ошибку, если категория не найдена
+        } else {
             return ResponseEntity.badRequest().body("Категория не найдена.");
         }
     }
+
 
     // Метод для удаления категории
     @GetMapping("/{category_name}/delete")

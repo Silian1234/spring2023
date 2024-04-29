@@ -10,6 +10,8 @@ public class LoreCategory {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
+
+    private String description;
     @OneToMany(mappedBy = "category")
     private Set<LoreTopic> topics;
 
@@ -41,9 +43,17 @@ public class LoreCategory {
         this.topics = topics;
     }
 
-    public LoreCategory(Long id, String name, Set<LoreTopic> topics) {
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public LoreCategory(Long id, String name, String description, Set<LoreTopic> topics) {
         this.id = id;
         this.name = name;
         this.topics = topics;
+        this.description = description;
     }
 }

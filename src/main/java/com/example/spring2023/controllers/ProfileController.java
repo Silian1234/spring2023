@@ -29,7 +29,6 @@ public class ProfileController {
         return "profileDir/profileReg";
     }
 
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -44,7 +43,7 @@ public class ProfileController {
 
     @GetMapping("/login")
     public String login() {
-        return "login"; // Имя вашего шаблона страницы входа
+        return "login";
     }
 
     @PostMapping("/login")
