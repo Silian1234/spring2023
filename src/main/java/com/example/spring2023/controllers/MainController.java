@@ -21,16 +21,6 @@ public class MainController {
         model.addAttribute("title", "Главная страница");
         return "home";
     }
-    @GetMapping("/classes")
-    public String classes(Model model) {
-        model.addAttribute("title", "Классы");
-        return "classes";
-    }
-    @GetMapping("/races")
-    public String races(Model model) {
-        model.addAttribute("title", "Расы");
-        return "races";
-    }
 
     @Autowired
     private ItemsRepository itemsRepository;
