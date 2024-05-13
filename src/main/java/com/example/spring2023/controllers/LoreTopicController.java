@@ -1,75 +1,126 @@
 package com.example.spring2023.controllers;
 
-// Импорт нужных классов
+//импорт моделей приложения
 import com.example.spring2023.models.LoreCategory;
 import com.example.spring2023.models.LoreTopic;
+//импорт репозиториев для взаимодействия с базой данных
 import com.example.spring2023.repo.LoreCategoryRepository;
 import com.example.spring2023.repo.LoreTopicRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-// Класс контроллера с указанным маршрутом
-@Controller
-@RequestMapping("/lore/{categoryId}/topics")
+import java.util.List;
+import java.util.Optional;
+
+//Декларация класса как REST контроллера
+@RestController
+//Сопоставление URL, например: "/api/lore/{categoryId}/topics"
+@RequestMapping("/api/lore/{categoryId}/topics")
+
 public class LoreTopicController {
 
-    // Поля для хранилищ топиков и категорий
+    //Объявление репозиториев для работы с базой данных
     private final LoreTopicRepository topicRepository;
     private final LoreCategoryRepository categoryRepository;
 
-    // Конструктор класса контроллера с инъекцией зависимости через конструктор
+    //Инициализация репозиториев с помощью конструктора
     public LoreTopicController(LoreTopicRepository topicRepository, LoreCategoryRepository categoryRepository) {
         this.topicRepository = topicRepository;
         this.categoryRepository = categoryRepository;
     }
 
-    // Метод для создания нового топика в заданной категории
-    @PostMapping
-    public ResponseEntity<String> createTopic(@PathVariable Long categoryId, @RequestBody LoreTopic topic) {
-        // Проверка нахождения категории в базе данных
-        return categoryRepository.findById(categoryId).map(category -> {
-            // Связывание топика с заданной категорией
-            topic.setCategory(category);
-            // Сохранение топика в базе данных
-            topicRepository.save(topic);
-            // Возвращение ответа о успешном создании топика
-            return ResponseEntity.ok("Топик успешно создан.");
-        }).orElse(ResponseEntity.badRequest().body("Категория не найдена."));
+    //Метод для получения всех тем в заданной категории
+    @GetMapping("/")
+    public ResponseEntity<List<LoreTopic>> getAllTopics(@PathVariable Long categoryId) {
+        Optional<LoreCategory> categoryOpt = categoryRepository.findById(categoryId);
+
+        //Проверка на существование категории
+        if (!categoryOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //Получение список тем
+        List<LoreTopic> topics = topicRepository.findByCategoryId(categoryId);
+        return ResponseEntity.ok(topics);
     }
 
-    // Метод для обновления существующего топика
+    //Метод для получения темы по id в определенной категории
+    @GetMapping("/{topicId}")
+    public ResponseEntity<LoreTopic> getTopicById(@PathVariable Long categoryId, @PathVariable Long topicId) {
+        Optional<LoreCategory> categoryOpt = categoryRepository.findById(categoryId);
+
+        if (!categoryOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Optional<LoreTopic> topicOpt = topicRepository.findById(topicId);
+
+        if (!topicOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //Возвращаем найденную тему
+        return ResponseEntity.ok(topicOpt.get());
+    }
+
+    //Метод для создания новой темы
+    @PostMapping("/")
+    public ResponseEntity<LoreTopic> createTopic(@PathVariable Long categoryId, @RequestBody LoreTopic topic) {
+        Optional<LoreCategory> categoryOpt = categoryRepository.findById(categoryId);
+
+        if (!categoryOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //Установка категории для новой темы
+        LoreCategory category = categoryOpt.get();
+        topic.setCategory(category);
+        //Сохранение новой темы
+        topicRepository.save(topic);
+        return ResponseEntity.ok(topic);
+    }
+
+    //Метод для обновления существующей темы
     @PutMapping("/{topicId}")
-    public ResponseEntity<String> updateTopic(@PathVariable Long categoryId, @PathVariable Long topicId, @RequestBody LoreTopic updatedTopic) {
-        // Проверка нахождения категории в базе данных
-        if (!categoryRepository.existsById(categoryId)) {
-            return ResponseEntity.badRequest().body("Категория не найдена.");
+    public ResponseEntity<LoreTopic> updateTopic(@PathVariable Long categoryId, @PathVariable Long topicId, @RequestBody LoreTopic updatedTopic) {
+        Optional<LoreCategory> categoryOpt = categoryRepository.findById(categoryId);
+
+        if (!categoryOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
         }
-        // Проверка нахождения топика в базе данных
-        return topicRepository.findById(topicId).map(topic -> {
-            // Обновление данных топика
-            topic.setTitle(updatedTopic.getTitle());
-            topic.setContent(updatedTopic.getContent());
-            // Сохранение обновлённого топика в базе данных
-            topicRepository.save(topic);
-            // Возвращение ответа об успешном обновлении топика
-            return ResponseEntity.ok("Топик успешно обновлен.");
-        }).orElse(ResponseEntity.badRequest().body("Топик не найден."));
+
+        Optional<LoreTopic> topicOpt = topicRepository.findById(topicId);
+
+        if (!topicOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //Перезапись информации о теме
+        LoreTopic topic = topicOpt.get();
+        topic.setTitle(updatedTopic.getTitle());
+        topic.setContent(updatedTopic.getContent());
+        //Сохранение обновленной темы
+        topicRepository.save(topic);
+        return ResponseEntity.ok(topic);
     }
 
-    // Метод для удаления топика
+    //Метод для удаления темы
     @DeleteMapping("/{topicId}")
-    public ResponseEntity<String> deleteTopic(@PathVariable Long categoryId, @PathVariable Long topicId) {
-        // Проверка нахождения категории в базе данных
-        if (!categoryRepository.existsById(categoryId)) {
-            return ResponseEntity.badRequest().body("Категория не найдена.");
+    public ResponseEntity<Void> deleteTopic(@PathVariable Long categoryId, @PathVariable Long topicId) {
+        Optional<LoreCategory> categoryOpt = categoryRepository.findById(categoryId);
+
+        if (!categoryOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
         }
-        // Проверка нахождения топика в базе данных
-        return topicRepository.findById(topicId).map(topic -> {
-            // Удаление топика из базы данных
-            topicRepository.delete(topic);
-            // Возвращение ответа об успешном удалении топика
-            return ResponseEntity.ok("Топик успешно удален.");
-        }).orElse(ResponseEntity.badRequest().body("Топик не найден."));
+
+        Optional<LoreTopic> topicOpt = topicRepository.findById(topicId);
+
+        if (!topicOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        //Удаление темы
+        topicRepository.deleteById(topicId);
+        return ResponseEntity.ok().build();
     }
 }

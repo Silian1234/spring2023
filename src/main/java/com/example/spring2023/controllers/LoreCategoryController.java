@@ -6,64 +6,80 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-// Примечание к маршруту для этого контроллера
-@RequestMapping("/lore")
-@Controller
+import java.util.Optional;
+
+// Определение основного URL
+@RequestMapping("/api/lore")
+@RestController
 public class LoreCategoryController {
-    // Инициализация репозитория
+
+    // Объявление репозитория
     private final LoreCategoryRepository repository;
 
-    // Конструктор с инъекцией репозитория
+    // Конструктор: инициализация репозитория
     LoreCategoryController(LoreCategoryRepository repository) {
         this.repository = repository;
     }
+    // Получение всех категорий
+    @GetMapping("/")
+    public ResponseEntity<Iterable<LoreCategory>> getCategories() {
+        return ResponseEntity.ok(repository.findAll());
+    }
 
-    // Метод для добавления категории
-    @PostMapping("/{category_name}")
-    public ResponseEntity<String> addCategory(@PathVariable String category_name, @RequestBody LoreCategory category) {
+    // Получение категории по ID
+    @GetMapping("/{category_id}")
+    public ResponseEntity<LoreCategory> getCategory(@PathVariable Long category_id) {
+        Optional<LoreCategory> existingCategoryOpt = repository.findById(category_id);
+
+        // Если категория не найдена, ответ - 404
+        if (!existingCategoryOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Возврат найденной категории
+        return ResponseEntity.ok(existingCategoryOpt.get());
+    }
+
+    // Добавление новой категории
+    @PostMapping("/")
+    public ResponseEntity<LoreCategory> addCategory(@RequestBody LoreCategory category) {
         LoreCategory newCategory = new LoreCategory();
-        newCategory.setName(category_name);
-        newCategory.setDescription(category.getDescription()); // Устанавливаем описание из запроса
+        newCategory.setName(category.getName());
+        newCategory.setDescription(category.getDescription());
         repository.save(newCategory);
-        return ResponseEntity.ok("Категория добавлена.");
+        return ResponseEntity.ok(newCategory);
     }
 
+    // Обновление существующей категории
+    @PutMapping("/{category_id}")
+    public ResponseEntity<LoreCategory> updateCategory(@PathVariable Long category_id, @RequestBody LoreCategory updatedCategory) {
+        Optional<LoreCategory> existingCategoryOpt = repository.findById(category_id);
 
-    // Метод для обновления категории
-    @PostMapping("/{category_name}/update")
-    public ResponseEntity<String> updateCategory(@PathVariable String category_name, @RequestBody LoreCategory updatedCategory) {
-        LoreCategory existingCategory = repository.findByName(category_name);
-
-        if (existingCategory != null) {
-            existingCategory.setName(updatedCategory.getName());
-            existingCategory.setDescription(updatedCategory.getDescription());  // Обновляем описание категории
-            repository.save(existingCategory);
-            return ResponseEntity.ok("Категория обновлена.");
-        } else {
-            return ResponseEntity.badRequest().body("Категория не найдена.");
+        // Если категория не найдена, ответ - 404
+        if (!existingCategoryOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
         }
+
+        // Обновление поля "name" и "description" найденной категории
+        LoreCategory existingCategory = existingCategoryOpt.get();
+        existingCategory.setName(updatedCategory.getName());
+        existingCategory.setDescription(updatedCategory.getDescription());
+        repository.save(existingCategory);
+        return ResponseEntity.ok(existingCategory);
     }
 
+    // Удаление категории
+    @DeleteMapping("/{category_id}")
+    public ResponseEntity deleteCategory(@PathVariable Long category_id) {
+        Optional<LoreCategory> existingCategoryOpt = repository.findById(category_id);
 
-    // Метод для удаления категории
-    @GetMapping("/{category_name}/delete")
-    public ResponseEntity<String> deleteCategory(@PathVariable String category_name) {
-        // Поиск существующей категории
-        LoreCategory existingCategory = repository.findByName(category_name);
-
-        // Если категория существует, удаляем ее
-        if(existingCategory != null){
-            // Удаление категории
-            repository.delete(existingCategory);
-            // Возвращение ответа
-            return ResponseEntity.ok("Категория удалена.");
-        }else{
-            // Вернуть ошибку, если категория не найдена
-            return ResponseEntity.badRequest().body("Категория не найдена.");
+        // Если категория не найдена, ответ - 404
+        if (!existingCategoryOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
         }
+
+        // Удаление найденной категории
+        repository.deleteById(category_id);
+        return ResponseEntity.ok().build();
     }
 }
-    //Я хотел бы получить ваши рекомендации по тому как правильнее реализовать данный способ для создания категорий и управления топиками
-    //Я решил создать довольно интересную задумку, чтобы модератор сам решал какие категории ему нужны в лоре, так как это дело каждого
-    //Так что здесь я не создаю чёткого ограничения, и модератор вправе сам создавать новые категории, топики в них и в них уже создавать какие либо сущности
-    //В качестве примера модератор создаёт категорию "Боги" и в ней создаёт топик "Бог войны", "Богиня магии" и т.д.

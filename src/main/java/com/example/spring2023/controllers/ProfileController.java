@@ -1,53 +1,65 @@
 package com.example.spring2023.controllers;
 
-import com.example.spring2023.models.Items;
+// Импорт необходимых библиотек и классов
 import com.example.spring2023.models.Users;
 import com.example.spring2023.repo.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import java.io.Console;
+import java.util.Optional;
 
-@Controller
+// Контроллер для работы с профилями пользователей
+@RestController
+@RequestMapping("/api/profile")
 public class ProfileController {
-    @GetMapping("/profile")
-    public String news(Model model) {
-        model.addAttribute("title", "Профиль");
-        return "profileDir/profile";
-    }
 
+    // Автоматическое внедрение репозитория пользователей
     @Autowired
     private UsersRepository usersRepository;
 
-    @GetMapping("/registration")
-    public String usersAdd(Model model) {
-        return "profileDir/profileReg";
-    }
-
+    // Автоматическое внедрение кодера паролей
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // Обработка POST запроса на регистрацию нового пользователя
     @PostMapping("/registration")
-    public String usersPostAdd(@RequestParam String username, @RequestParam String email, @RequestParam String password, @RequestParam(required = false) String type, Model model) {
-        String encodedPassword = passwordEncoder.encode(password);
-        Users user = new Users(username, email, encodedPassword, type);
+    public Users usersPostAdd(@RequestBody Users user) {
+        // Кодирование пароля пользователя
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        // Установка пароля пользователю
+        user.setPassword(encodedPassword);
+        // Установка типа пользователя
         user.setUserType("user");
-        usersRepository.save(user);
-        return "redirect:/login"; // Перенаправление на страницу входа после успешной регистрации
+        // Сохранение пользователя в репозиторий и возврат его
+        return usersRepository.save(user);
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "login";
+    // Обработка GET запроса на получение списка всех пользователей
+    @GetMapping("/users")
+    public Iterable<Users> getAllUsers() {
+        return usersRepository.findAll();
     }
 
-    @PostMapping("/login")
-    public String doLogin(){
-        return "home";
+    // Обработка GET запроса на получение пользователя по его ID
+    @GetMapping("/users/{id}")
+    public Optional<Users> getUserById(@PathVariable Long id) {
+        return usersRepository.findById(id);
+    }
+
+    // Обработка PUT запроса на обновление данных пользователя по его ID
+    @PutMapping("/users/{id}")
+    public Users updateUser(@PathVariable Long id, @RequestBody Users userDetails) {
+        // Поиск пользователя по ID и исключение, если пользователь не найден
+        Users user = usersRepository.findById(id).orElseThrow();
+        // Кодирование нового пароля пользователя
+        String encodedPassword = passwordEncoder.encode(userDetails.getPassword());
+        // Установка нового пароля пользователю
+        user.setPassword(encodedPassword);
+        // Установка нового имени пользователя
+        user.setUsername(userDetails.getUsername());
+        // Сохранение обновленного пользователя в репозиторий и возврат его
+        user = usersRepository.save(user);
+        return user;
     }
 }

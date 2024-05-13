@@ -1,80 +1,68 @@
 package com.example.spring2023.controllers;
 
+// Импортируем необходимые классы и библиотеки
 import com.example.spring2023.models.Classes;
 import com.example.spring2023.repo.ClassesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
-@Controller
+
+@RestController  // Аннотация, указывающая, что этот класс является REST контроллером
+@RequestMapping("/api/classes")  // Аннотация для маппинга URL
 public class ClassesController {
 
-    @Autowired
-    private ClassesRepository classesRepository;  // Автоматическое подключение репозитория классов
+    @Autowired  // Аннотация для автоматического связывания экземпляров в Spring
+    private ClassesRepository classesRepository;
 
-    // Отображение списка всех классов
-    @GetMapping("/classes")
-    public String listClasses(Model model) {
-        Iterable<Classes> classes = classesRepository.findAll();  // Получение всех классов из репозитория
-        model.addAttribute("classes", classes);  // Добавление списка классов в модель для отображения
-        return "classes";  // Возвращение страницы со списком классов
+    // Эндпоинт для получения списка всех классов
+    @GetMapping("/")
+    public ResponseEntity<List<Classes>> listClasses() {
+        List<Classes> classes =
+StreamSupport.stream(classesRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());  // Использование Stream API для создания списка классов
+        // Возврат списка классов в виде HTTP-ответа с статусом ОК
+        return new ResponseEntity<>(classes, HttpStatus.OK);
     }
 
-    // Переход к форме добавления нового класса
-    @GetMapping("/classes/add")
-    public String classesAdd(Model model) {
-        return "classes-add";  // Возвращение страницы для добавления нового класса
+    // Эндпоинт для получения информации о конкретном классе по его id
+    @GetMapping("/{id}")
+    public ResponseEntity<Classes> classesInfo(@PathVariable(value = "id") long id) {
+        Optional<Classes> cl = classesRepository.findById(id);  // Поиск класса по ID
+        // Проверяем, найден ли класс. Если да, то возвращаем его. Если нет, то возвращаем статус NOT_FOUND
+        return cl.map(classes -> new ResponseEntity<>(classes, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    // Получение и отображение деталей конкретного класса
-    @GetMapping("/classes/{id}")
-    public String classesInfo(@PathVariable(value = "id") long id, Model model) {
-        Optional<Classes> cl = classesRepository.findById(id);  // Поиск класса по идентификатору
-        ArrayList<Classes> result = new ArrayList<>();
-        cl.ifPresent(result::add);  // Добавление найденного класса в список, если он существует
-        model.addAttribute("class", result);  // Добавление класса в модель
-        return "classes-info";  // Возвращение страницы с информацией о классе
-    }
-
-    // Переход к форме редактирования класса
-    @GetMapping("/classes/{id}/edit")
-    public String classesEdit(@PathVariable(value = "id") long id, Model model) {
-        Optional<Classes> cl = classesRepository.findById(id);  // Поиск класса по идентификатору
-        ArrayList<Classes> result = new ArrayList<>();
-        cl.ifPresent(result::add);  // Добавление найденного класса в список, если он существует
-        model.addAttribute("class", result);  // Добавление класса в модель
-        return "classes-edit";  // Возвращение страницы для редактирования класса
-    }
-
-    // Обновление данных класса после редактирования
-    @PostMapping("/classes/{id}/edit")
-    public String classesUpdate(@PathVariable(value = "id") long id, @RequestParam String name, @RequestParam String description, @RequestParam String benefit, @RequestParam Map<String, String> abilities, Model model) {
-        Optional<Classes> cl = classesRepository.findById(id);  // Поиск класса по идентификатору
-        if (cl.isPresent()) {
-            Classes updatedClass = cl.get();  // Получение объекта класса для обновления
-            updatedClass.setName(name);  // Обновление имени класса
-            updatedClass.setDescription(description);  // Обновление описания
-            updatedClass.setBenefit(benefit);  // Обновление преимущества
-            updatedClass.setAbilities(abilities);  // Обновление списка способностей
-            classesRepository.save(updatedClass);  // Сохранение изменений в базе данных
+    // Эндпоинт для обновления класса по его id
+    @PutMapping("/{id}")
+    public ResponseEntity<Classes> classesUpdate(@PathVariable(value = "id") long id, @RequestBody Map<String, String> updates) {
+        Optional<Classes> cl = classesRepository.findById(id);  // Поиск класса по ID
+        if(cl.isPresent()){
+            Classes updatedClass = cl.get();  // Получаем класс из Optional
+            // Обновляем поля класса
+            updatedClass.setName(updates.get("name"));
+            updatedClass.setDescription(updates.get("description"));
+            updatedClass.setBenefit(updates.get("benefit"));
+            updatedClass.setAbilities(updates);
+            classesRepository.save(updatedClass);  // Сохраняем обновленный класс
+            return new ResponseEntity<>(updatedClass, HttpStatus.OK);  // Возвращаем обновленный класс
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);  // Если класс не найден, то возвращаем статус NOT_FOUND
         }
-        return "redirect:/classes";  // Перенаправление на страницу со списком классов
     }
 
-    // Добавление нового класса
-    @PostMapping("/classes/add")
-    public String classesPostAdd(@RequestParam String name, @RequestParam String description, @RequestParam String benefit, @RequestParam Map<String, String> abilities, Model model) {
-        Classes newClass = new Classes(name, description, benefit, abilities);  // Создание нового объекта класса
-        classesRepository.save(newClass);  // Сохранение нового класса в базе данных
-        return "redirect:/classes";  // Перенаправление на страницу со списком классов
+    // Эндпоинт для создания нового класса
+    @PostMapping("/")
+    public ResponseEntity<Classes> classesPostAdd(@RequestBody Map<String, String> newClassData) {
+        // Создаем новый класс и передаем в него данные
+        Classes newClass = new Classes(newClassData.get("name"), newClassData.get("description"), newClassData.get("benefit"), newClassData);
+        classesRepository.save(newClass);  // Сохраняем новый класс
+        // Возвращаем новый класс с HTTP статусом CREATED
+        return new ResponseEntity<>(newClass, HttpStatus.CREATED);
     }
 }
