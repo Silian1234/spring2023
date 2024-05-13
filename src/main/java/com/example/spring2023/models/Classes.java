@@ -1,9 +1,7 @@
 package com.example.spring2023.models;
 
 import jakarta.persistence.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 public class Classes {
@@ -15,11 +13,18 @@ public class Classes {
     private String description;
     private String benefit;
 
-    @ElementCollection
-    @CollectionTable(name = "class_abilities")
-    @MapKeyColumn(name = "ability_name")
-    @Column(name = "ability_description")
-    private Map<String, String> abilities = new HashMap<>();
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "class_id")
+    private List<Ability> abilities = new ArrayList<>();
+
+    public Classes() {}
+
+    public Classes(String name, String description, String benefit, List<Ability> abilities) {
+        this.name = name;
+        this.description = description;
+        this.benefit = benefit;
+        this.abilities = abilities;
+    }
 
     public Long getId() {
         return id;
@@ -53,20 +58,12 @@ public class Classes {
         this.benefit = benefit;
     }
 
-    public Map<String, String> getAbilities() {
+    public List<Ability> getAbilities() {
         return abilities;
     }
 
-    public void setAbilities(Map<String, String> abilities) {
-        this.abilities = abilities;
-    }
-
-    public Classes() {}
-
-    public Classes(String name, String description, String benefit, Map<String, String> abilities) {
-        this.name = name;
-        this.description = description;
-        this.benefit = benefit;
+    public void setAbilities(List<Ability> abilities) {
         this.abilities = abilities;
     }
 }
+
