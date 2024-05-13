@@ -15,7 +15,7 @@ import java.util.stream.StreamSupport;
 // Аннотация RestController означает, что данный класс рассматривается как контроллер,
 // который будет отвечать на запросы к Web API.
 @RestController
-@RequestMapping("/api/items") // Пометка URL-пути (точка входа в API), который будет обрабатываться этим контроллером.
+@RequestMapping("/api") // Пометка URL-пути (точка входа в API), который будет обрабатываться этим контроллером.
 public class ItemsController {
 
     @Autowired // Автоматическое связывание нашего репозитория Spring
