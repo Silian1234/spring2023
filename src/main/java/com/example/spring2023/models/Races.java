@@ -1,10 +1,9 @@
 package com.example.spring2023.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ElementCollection;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -18,6 +17,9 @@ public class Races {
     private String features;
     private String appearance;
     private String benefit;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "class_id")
+    private List<Ability> abilities = new ArrayList<>();
 
     private String source;
 
@@ -31,6 +33,7 @@ public class Races {
         this.features = features;
         this.appearance = appearance;
         this.benefit = benefit;
+        this.abilities = abilities;
         this.source = source;
         this.tags = tags;
     }
@@ -73,20 +76,28 @@ public class Races {
         this.features = features;
     }
 
-    public String getAdvantages() {
+    public String getAppearance() {
         return appearance;
     }
 
-    public void setAdvantages(String advantages) {
-        this.appearance = advantages;
+    public void setAppearance(String appearance) {
+        this.appearance = appearance;
     }
 
-    public String getDisadvantages() {
+    public String getBenefit() {
         return benefit;
     }
 
-    public void setDisadvantages(String disadvantages) {
-        this.benefit = disadvantages;
+    public void setBenefit(String benefit) {
+        this.benefit = benefit;
+    }
+
+    public List<Ability> getAbilities() {
+        return abilities;
+    }
+
+    public void setAbilities(List<Ability> abilities) {
+        this.abilities = abilities;
     }
 
     public String getSource() {

@@ -52,6 +52,9 @@ public class RacesController {
             race.setDescription(newRace.getDescription());
             race.setFeatures(newRace.getFeatures());
             race.setSource(newRace.getSource());
+            race.setAppearance(newRace.getAppearance());
+            race.setAbilities(newRace.getAbilities());
+            race.setBenefit(newRace.getBenefit());
             race.setTags(newRace.getTags());
             return racesRepository.save(race);
         });

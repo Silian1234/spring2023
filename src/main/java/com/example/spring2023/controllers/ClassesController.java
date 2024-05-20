@@ -41,6 +41,7 @@ public class ClassesController {
             updatedClass.setDescription(updatedClassData.getDescription());
             updatedClass.setBenefit(updatedClassData.getBenefit());
             updatedClass.setAbilities(updatedClassData.getAbilities());
+            updatedClass.setSource(updatedClassData.getSource());
             classesRepository.save(updatedClass);
             return new ResponseEntity<>(updatedClass, HttpStatus.OK);
         } else {
@@ -52,5 +53,15 @@ public class ClassesController {
     public ResponseEntity<Classes> classesPostAdd(@RequestBody Classes newClassData) {
         classesRepository.save(newClassData);
         return new ResponseEntity<>(newClassData, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> classesDelete(@PathVariable(value = "id") long id) {
+        if (classesRepository.existsById(id)) {
+            classesRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

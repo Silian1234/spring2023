@@ -12,18 +12,28 @@ public class Classes {
     private String name;
     private String description;
     private String benefit;
-
+    private String source;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "class_id")
     private List<Ability> abilities = new ArrayList<>();
 
     public Classes() {}
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
     public Classes(String name, String description, String benefit, List<Ability> abilities) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.benefit = benefit;
         this.abilities = abilities;
+        this.source = source;
     }
 
     public Long getId() {

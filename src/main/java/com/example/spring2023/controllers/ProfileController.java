@@ -22,7 +22,11 @@ public class ProfileController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // Обработка POST запроса на регистрацию нового пользователя
+    /**
+     * Обработка POST запроса на регистрацию нового пользователя
+     * @param user данные нового пользователя
+     * @return данные сохранённого пользователя
+     */
     @PostMapping("/registration")
     public Users usersPostAdd(@RequestBody Users user) {
         // Кодирование пароля пользователя
